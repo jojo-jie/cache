@@ -17,6 +17,7 @@ type Value interface {
 	Len() int
 }
 
+// CalcLen 返回类型占用字节数
 func CalcLen(value interface{}) int {
 	var n int
 	switch v := value.(type) {

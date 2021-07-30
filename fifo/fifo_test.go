@@ -22,7 +22,7 @@ func TestOnEvicted(t *testing.T) {
 	onEvicted := func(key string, value interface{}) {
 		keys = append(keys, key)
 	}
-	cache := New(16, onEvicted)
+	cache := New(8, onEvicted)
 	cache.Set("k1", 1)
 	cache.Set("k2", 2)
 	cache.Get("k1")

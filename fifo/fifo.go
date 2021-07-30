@@ -19,6 +19,7 @@ type fifo struct {
 	cache     map[string]*list.Element
 }
 
+// 元素结构
 type entry struct {
 	key   string
 	value interface{}
@@ -41,6 +42,7 @@ func (f *fifo) Set(key string, value interface{}) {
 	if e, ok := f.cache[key]; ok {
 		f.ll.MoveToBack(e)
 		en := e.Value.(*entry)
+		// save-old+new
 		f.usedBytes = f.usedBytes - cache.CalcLen(en.value) + cache.CalcLen(value)
 		en.value = value
 		return
@@ -49,8 +51,9 @@ func (f *fifo) Set(key string, value interface{}) {
 	e := f.ll.PushBack(en)
 	f.cache[key] = e
 	f.usedBytes += en.Len()
+	// 超出最大字节数==>过期
 	if f.maxBytes > 0 && f.usedBytes > f.maxBytes {
-		
+		f.DelOldest()
 	}
 }
 
