@@ -35,3 +35,5 @@ func TestOnEvicted(t *testing.T) {
 	is.Equal(expected, keys)
 	is.Equal(2,cache.Len())
 }
+
+

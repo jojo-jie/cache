@@ -40,6 +40,7 @@ func New(maxBytes int, onEvicted func(key string, value interface{})) cache.Cach
 
 func (f *fifo) Set(key string, value interface{}) {
 	if e, ok := f.cache[key]; ok {
+		// 存在移动队尾，并更新value
 		f.ll.MoveToBack(e)
 		en := e.Value.(*entry)
 		// save-old+new
