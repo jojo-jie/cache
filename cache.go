@@ -2,8 +2,59 @@ package cache
 
 import (
 	"fmt"
+	"log"
 	"runtime"
+	"sync"
 )
+
+const DefaultMaxBytes = 1 << 29
+
+type safeCache struct {
+	m     sync.RWMutex
+	cache Cache
+	nhit  int
+	nget  int
+}
+
+func newSafeCache(cache Cache) *safeCache {
+	return &safeCache{
+		cache: cache,
+	}
+}
+
+func (sc *safeCache) Set(key string, value interface{}) {
+	sc.m.Lock()
+	defer sc.m.Unlock()
+	sc.cache.Set(key, value)
+}
+
+func (sc *safeCache) Get(key string) interface{} {
+	sc.m.RLock()
+	defer sc.m.RUnlock()
+	sc.nget++
+	if sc.cache != nil {
+		return nil
+	}
+	v := sc.cache.Get(key)
+	if v != nil {
+		log.Println("[TourCache] hit")
+		sc.nhit++
+	}
+	return v
+}
+
+func (sc *safeCache) Stat() *Stat {
+	sc.m.Lock()
+	defer sc.m.Unlock()
+	return &Stat{
+		NHit: sc.nhit,
+		NGet: sc.nget,
+	}
+}
+
+type Stat struct {
+	NHit, NGet int
+}
 
 type Cache interface {
 	Set(key string, value interface{})
