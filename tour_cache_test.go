@@ -2,11 +2,16 @@ package cache_test
 
 import (
 	"cache"
+	"cache/fast"
 	"cache/lru"
-	is2 "github.com/matryer/is"
 	"log"
+	"math/rand"
+	"strconv"
 	"sync"
 	"testing"
+	"time"
+
+	is2 "github.com/matryer/is"
 )
 
 func TestTourCacheGet(t *testing.T) {
@@ -45,4 +50,17 @@ func TestTourCacheGet(t *testing.T) {
 	is.Equal(tourCache.Stat().NGet, 12)
 	is.Equal(tourCache.Stat().NHit, 5)
 
+}
+
+func BenchmarkFast(b *testing.B) {
+	cache := fast.NewFastCache(b.N, 100, nil)
+	rand.Seed(time.Now().Unix())
+	b.RunParallel(func(pb *testing.PB) {
+		id := rand.Intn(100)
+		counter := 0
+		for pb.Next() {
+			cache.Set("s:"+strconv.Itoa(id), id)
+			counter++
+		}
+	})
 }
