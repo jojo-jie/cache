@@ -15,6 +15,13 @@ type TourCache struct {
 	getter    Getter
 }
 
+func (t TourCache) Set(key string, value interface{})  {
+	if value == nil {
+		return
+	}
+	t.mainCache.Set(key, value)
+}
+
 func (t *TourCache) Get(key string) interface{} {
 	val := t.mainCache.Get(key)
 	if val != nil {

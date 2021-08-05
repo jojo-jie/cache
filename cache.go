@@ -32,7 +32,7 @@ func (sc *safeCache) Get(key string) interface{} {
 	sc.m.RLock()
 	defer sc.m.RUnlock()
 	sc.nget++
-	if sc.cache != nil {
+	if sc.cache == nil {
 		return nil
 	}
 	v := sc.cache.Get(key)
