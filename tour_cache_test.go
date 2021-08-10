@@ -2,12 +2,13 @@ package cache_test
 
 import (
 	"cache"
+	"cache/add"
 	"cache/fast"
 	"cache/lru"
 	"log"
 	"math/rand"
 	"net/http"
-	_ "net/http/pprof"
+	"net/http/pprof"
 	"runtime"
 	"strconv"
 	"sync"
@@ -114,13 +115,13 @@ func init() {
 func TestHttpPProf(t *testing.T) {
 	go func() {
 		for {
-			t.Logf("len: %d", Add("tour-book"))
+			t.Logf("len: %d", add.Add("tour-book"))
 			time.Sleep(time.Millisecond * 10)
 		}
 	}()
-	go func() {
+	/*go func() {
 		_ = http.ListenAndServe(":4444", nil)
-	}()
+	}()*/
 	var m sync.Mutex
 	var datas = make(map[int]struct{})
 	for i := 0; i < 999; i++ {
@@ -131,18 +132,24 @@ func TestHttpPProf(t *testing.T) {
 		}(i)
 	}
 	mux := http.NewServeMux()
+	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
 	mux.HandleFunc("/tt", func(writer http.ResponseWriter, request *http.Request) {
 		writer.Write([]byte("hello pprof"))
 	})
-	s := &http.Server{
-		Addr:    ":8896",
-		Handler: mux,
-	}
-	_ = s.ListenAndServe()
+	_=http.ListenAndServe(":8896", mux)
 }
 
-func Add(str string) int {
-	data := []byte(str)
-	datas = append(datas, string(data))
-	return len(data)
+func TestAdd(t *testing.T) {
+	_=add.Add("go-programmer-book")
+}
+
+//go test -bench=Add -benchmem -count=2 -run=none -cpuprofile=cpu.profile
+func BenchmarkAdd(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		add.Add("go-programmer-book")
+	}
 }
