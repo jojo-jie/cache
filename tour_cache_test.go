@@ -6,6 +6,9 @@ import (
 	"cache/lru"
 	"log"
 	"math/rand"
+	"net/http"
+	_ "net/http/pprof"
+	"runtime"
 	"strconv"
 	"sync"
 	"testing"
@@ -81,4 +84,65 @@ func BenchmarkFast(b *testing.B) {
 			counter++
 		}
 	})
+}
+
+var datas []string
+
+// 采样方式
+// runtime/pprof 采集程序 指定区块的运行数据进行分析
+// net/http/pprof 基于http server运行，并且可以采集运行时的数据进行分析
+// go test 通过运行测试用例 指定所需要标识进行采集
+// 使用模式
+// report generation 报告生成
+// 交互式终端使用
+// web界面 http://127.0.0.1:port/debug/pprof  +debug=1 可直接在浏览器中访问 无denbug参数 直接下载profile 文件
+// full goroutine stack map
+// allocs 查看过去所有内存分配的样本，访问路径为$HOST/debug/pprof/allocs
+// block 查看导致阻塞同步的堆栈跟踪，访问路径为$HOST/debug/pprof/block
+// cmdline 当前程序命令行的完整调用路径
+// goroutine 查看当前所有运行的goroutines 堆栈跟踪 访问路径为$HOST/debug/pprof/goroutine
+// heap 查看活动对象的内存分配情况
+// mutex 查看导致互斥锁的竞争持有者的堆栈跟踪 访问路径为$HOST/debug/pprof/mutex
+// profile 默认进行30s cpu Profiling 会得到一个分析用的profile 文件 访问路径为$HOST/debug/pprof/profile
+// threadcreate 查看创建os线程的堆栈跟踪 访问路径为$HOST/debug/pprof/threadcreate
+
+func init() {
+	runtime.SetMutexProfileFraction(1)
+	runtime.SetBlockProfileRate(1)
+}
+
+func TestHttpPProf(t *testing.T) {
+	go func() {
+		for {
+			t.Logf("len: %d", Add("tour-book"))
+			time.Sleep(time.Millisecond * 10)
+		}
+	}()
+	go func() {
+		_ = http.ListenAndServe(":4444", nil)
+	}()
+	var m sync.Mutex
+	var datas = make(map[int]struct{})
+	for i := 0; i < 999; i++ {
+		go func(i int) {
+			m.Lock()
+			defer m.Unlock()
+			datas[i] = struct{}{}
+		}(i)
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/tt", func(writer http.ResponseWriter, request *http.Request) {
+		writer.Write([]byte("hello pprof"))
+	})
+	s := &http.Server{
+		Addr:    ":8896",
+		Handler: mux,
+	}
+	_ = s.ListenAndServe()
+}
+
+func Add(str string) int {
+	data := []byte(str)
+	datas = append(datas, string(data))
+	return len(data)
 }
