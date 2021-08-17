@@ -40,7 +40,7 @@ func (l *lru) Get(key string) interface{} {
 }
 
 func (l *lru) Del(key string) {
-	if e,ok:=l.cache[key];ok {
+	if e, ok := l.cache[key]; ok {
 		l.RemoveElement(e)
 	}
 }
@@ -53,15 +53,15 @@ func (l *lru) Len() int {
 	return l.ll.Len()
 }
 
-func (l *lru) RemoveElement(e *list.Element)  {
+func (l *lru) RemoveElement(e *list.Element) {
 	if e == nil {
 		return
 	}
 	l.ll.Remove(e)
-	en:=e.Value.(*entry)
+	en := e.Value.(*entry)
 	delete(l.cache, en.key)
-	l.usedBytes-=en.Len()
-	if l.onEvicted!=nil {
+	l.usedBytes -= en.Len()
+	if l.onEvicted != nil {
 		l.onEvicted(en.key, en.value)
 	}
 }
