@@ -27,8 +27,8 @@ func TestOnEvicted(t *testing.T) {
 //unsafe.Alignof 返回类型对齐系数
 //内存对其
 //对于结构体的各个成员，第一个成员位于偏移为0的位置，结构体第一个成员的偏移量(offset)为0，以后每个成员相对于结构体首地址的offset都是该成员大小与有效对齐值中较小那个的整数倍，如有需要编译器会在成员之间加上填充字节。
+//最后一个结构成员为struct{} 需特殊处理 struct{} 在最后会被填充对齐到前一个字段的对齐系数
 //除了结构成员需要对齐，结构本身也需要对齐，结构的长度必须是编译器默认的对齐长度和成员中最长类型中最小的数据大小的倍数对齐。
-
 type Demo struct {
 	A int32
 	B []int32
@@ -58,11 +58,13 @@ type test3 struct {
 
 type test4 struct {
 	b []int32
+	d bool
 	a struct{} //struct{} 在最后会被填充对齐到前一个字段的对齐系数
 }
 
 func TestStruct(t *testing.T) {
 	t4 := test4{}
+	t.Log(unsafe.Sizeof(t4.b))
 	t.Log(unsafe.Alignof(t4.b))
 	t.Log(unsafe.Sizeof(t4))
 }
