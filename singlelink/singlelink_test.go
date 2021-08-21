@@ -3,7 +3,7 @@ package singlelink
 import "testing"
 
 var link *LinkedList
-var n = 10
+var n = 3
 
 func init()  {
 	link=NewLinkedList()

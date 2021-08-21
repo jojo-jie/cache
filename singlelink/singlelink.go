@@ -123,5 +123,18 @@ func (l *LinkedList) Print() string {
 }
 
 func (l *LinkedList) Invert() {
-
+	if l.head == nil || l.head.next == nil {
+		fmt.Println("出错了!!!")
+		return
+	}
+	//1 2 3
+	var pre,temp *ListNode
+	var cur  *ListNode = l.head.next
+	for cur != nil {
+		temp = cur.next
+		cur.next = pre
+		pre = cur
+		cur = temp
+	}
+	l.head.next = pre
 }
