@@ -122,6 +122,7 @@ func (l *LinkedList) Print() string {
 	return format
 }
 
+// Invert 非递归链表反转
 func (l *LinkedList) Invert() {
 	if l.head == nil || l.head.next == nil {
 		fmt.Println("出错了!!!")
@@ -129,7 +130,7 @@ func (l *LinkedList) Invert() {
 	}
 	//1 2 3
 	var pre,temp *ListNode
-	var cur  *ListNode = l.head.next
+	cur := l.head.next
 	for cur != nil {
 		temp = cur.next
 		cur.next = pre
@@ -138,3 +139,16 @@ func (l *LinkedList) Invert() {
 	}
 	l.head.next = pre
 }
+
+func ReverseList(head *ListNode) *ListNode {
+	// 递归找到链表最后一个节点
+	if head == nil || head.next == nil {
+		return head
+	} else {
+		newhead:=ReverseList(head.next)
+		head.next.next = head
+		head.next = nil
+		return newhead
+	}
+}
+
