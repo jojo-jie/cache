@@ -129,7 +129,7 @@ func (l *LinkedList) Invert() {
 		return
 	}
 	//1 2 3
-	var pre,temp *ListNode
+	var pre, temp *ListNode
 	cur := l.head.next
 	for cur != nil {
 		temp = cur.next
@@ -140,15 +140,38 @@ func (l *LinkedList) Invert() {
 	l.head.next = pre
 }
 
-func ReverseList(head *ListNode) *ListNode {
+func Reverse(head *ListNode) *ListNode {
 	// 递归找到链表最后一个节点
 	if head == nil || head.next == nil {
 		return head
 	} else {
-		newhead:=ReverseList(head.next)
+		newhead := Reverse(head.next)
 		head.next.next = head
 		head.next = nil
 		return newhead
 	}
 }
 
+var successor *ListNode = nil
+
+func ReverseN(head *ListNode, n uint) *ListNode {
+	if n == 1 {
+		// 记录第n+1 个节点
+		successor = head.next
+		return head
+	}
+	last := ReverseN(head.next, n-1)
+	head.next.next = head
+	head.next = successor
+	return last
+}
+
+func ReverseBetween(head *ListNode, m, n uint) *ListNode {
+	// base case
+	if m == 1 {
+		return ReverseN(head, n)
+	}
+	// 前进到反转起点触发
+	head.next = ReverseBetween(head, m-1, n-1)
+	return head
+}

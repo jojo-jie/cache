@@ -6,7 +6,7 @@ import (
 )
 
 var link *LinkedList
-var n = 4
+var n = 10
 
 func init() {
 	link = NewLinkedList()
@@ -23,8 +23,8 @@ func TestLinked(t *testing.T) {
 	/*link.Invert()
 	t.Log(link.Print())*/
 
-	n := ReverseList(link.head)
-	s:=""
+	n := ReverseN(link.head.next, 4)
+	s := ""
 	for {
 		if n == nil {
 			break
