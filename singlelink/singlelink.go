@@ -123,21 +123,61 @@ func (l *LinkedList) Print() string {
 }
 
 // Invert 非递归链表反转
-func (l *LinkedList) Invert() {
+func (l *LinkedList) Invert(n uint, s *ListNode) {
 	if l.head == nil || l.head.next == nil {
 		fmt.Println("出错了!!!")
 		return
 	}
 	//1 2 3
 	var pre, temp *ListNode
-	cur := l.head.next
+	cur := s
+	var i uint
 	for cur != nil {
+		i++
 		temp = cur.next
 		cur.next = pre
 		pre = cur
 		cur = temp
+		if n > 0 && i == n {
+			s.next = temp
+			break
+		}
 	}
 	l.head.next = pre
+}
+
+func (l *LinkedList) InvertMN(m, n uint) {
+	if l.head == nil || l.head.next == nil {
+		fmt.Println("出错了!!!")
+		return
+	}
+	cur := l.head.next
+	var i uint
+	var pre, temp, s, e, o *ListNode
+	for cur != nil {
+		i++
+		temp = cur.next
+		if i+1 == m {
+			s = cur
+		}
+		if i >= m && i <= n {
+			if i == m {
+				e = cur
+			}
+			cur.next = pre
+			pre = cur
+			cur = temp
+			if i == n {
+				o = temp
+			}
+		}
+
+		cur = temp
+		if i > n {
+			s.next = pre
+			e.next = o
+		}
+	}
 }
 
 func Reverse(head *ListNode) *ListNode {

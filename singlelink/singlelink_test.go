@@ -20,8 +20,9 @@ func init() {
 // 链表反转
 func TestLinked(t *testing.T) {
 	t.Log(link.Print())
-	/*link.Invert()
-	t.Log(link.Print())*/
+	link.Invert(6,link.head.next)
+	link.InvertMN(3,6)
+	t.Log(link.Print())
 
 	n := ReverseN(link.head.next, 4)
 	s := ""
