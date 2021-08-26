@@ -215,3 +215,24 @@ func ReverseBetween(head *ListNode, m, n uint) *ListNode {
 	head.next = ReverseBetween(head, m-1, n-1)
 	return head
 }
+
+
+
+func MergeTwoLink(l1, l2 *ListNode) *ListNode {
+	if l1 == nil {
+		return l2
+	}
+	if l1 == nil {
+		return l1
+	}
+
+	var n *ListNode
+	if l1.data.(int) < l2.data.(int) {
+		n = l1
+		n.next = MergeTwoLink(l1.next, l2)
+	} else {
+		n = l2
+		n.next = MergeTwoLink(l1, l2.next)
+	}
+	return n
+}
